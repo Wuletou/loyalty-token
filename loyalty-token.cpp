@@ -2,7 +2,6 @@
 
 loyaltytoken::loyaltytoken(account_name self) :
 	eosio::contract(self),
-	exchange(eosio::string_to_name(STR(EXCHANGE))),
 	state_singleton(this->_self, this->_self),
 	state(state_singleton.exists() ? state_singleton.get() : default_parameters())
 {}
@@ -55,10 +54,8 @@ void loyaltytoken::issue(account_name to, eosio::asset quantity, std::string mem
 	add_balance(to, quantity, st.issuer);
 }
 
-void loyaltytoken::allowclaim(account_name from, eosio::asset quantity) {
-	require_auth(this->exchange);
-
-	account_name to = this->exchange;
+void loyaltytoken::allowclaim(account_name from, account_name to, eosio::asset quantity) {
+	require_auth(from);
 
 	require_recipient(from);
 	require_recipient(to);
@@ -66,14 +63,14 @@ void loyaltytoken::allowclaim(account_name from, eosio::asset quantity) {
 	accounts from_acnts(this->_self, from);
 	const auto& account = from_acnts.find(quantity.symbol.name());
 	eosio_assert(account != from_acnts.end(), "symbol not found");
-	from_acnts.modify(account, this->exchange, [quantity](auto& a) {
+	from_acnts.modify(account, from, [quantity](auto& a) {
 		a.blocked += quantity.amount;
 	});
 
 	claims from_claims(this->_self, from);
 	const auto& claim = from_claims.find(((uint128_t)to << 64) + quantity.symbol);
 	if (claim == from_claims.end()) {
-		from_claims.emplace(this->exchange, [to, quantity](auto& c) {
+		from_claims.emplace(from, [to, quantity](auto& c) {
 			c.to = to;
 			c.quantity = quantity;
 		});
@@ -81,7 +78,7 @@ void loyaltytoken::allowclaim(account_name from, eosio::asset quantity) {
 		if (claim->quantity.amount == -quantity.amount) {
 			from_claims.erase(claim);
 		} else {
-			from_claims.modify(claim, this->exchange, [quantity](auto& c) {
+			from_claims.modify(claim, from, [quantity](auto& c) {
 				c.quantity += quantity;
 			});
 		}
@@ -89,14 +86,14 @@ void loyaltytoken::allowclaim(account_name from, eosio::asset quantity) {
 }
 
 void loyaltytoken::claim(account_name from, account_name to, eosio::asset quantity) {
-	require_auth(this->exchange);
+	require_auth(to);
 
 	eosio_assert(quantity.amount > 0, "claim must be positive");
 
 	accounts from_acnts(this->_self, from);
 	const auto& account = from_acnts.find(quantity.symbol.name());
 	eosio_assert(account != from_acnts.end(), "symbol not found");
-	from_acnts.modify(account, this->exchange, [quantity](auto& a) {
+	from_acnts.modify(account, to, [quantity](auto& a) {
 		a.blocked -= quantity.amount;
 	});
 
@@ -106,13 +103,13 @@ void loyaltytoken::claim(account_name from, account_name to, eosio::asset quanti
 	if (claim->quantity.amount == quantity.amount) {
 		from_claims.erase(claim);
 	} else {
-		from_claims.modify(claim, this->exchange, [quantity](auto& c) {
+		from_claims.modify(claim, to, [quantity](auto& c) {
 			c.quantity -= quantity;
 		});
 	}
 
-	sub_balance(from, quantity, this->exchange);
-	add_balance(to, quantity, this->exchange);
+	sub_balance(from, quantity, to);
+	add_balance(to, quantity, to);
 }
 
 void loyaltytoken::setver(std::string ver, std::string hash) {
