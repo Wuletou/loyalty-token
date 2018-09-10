@@ -53,6 +53,8 @@ private:
 	typedef eosio::multi_index<N(stat), currency_stats> stats;
 	typedef eosio::multi_index<N(claim), claim_t> claims;
 
+	account_name exchange;
+
 	eosio::singleton<N(state), state_t> state_singleton;
 
 	state_t state;

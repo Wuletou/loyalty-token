@@ -1,7 +1,10 @@
 #include "loyalty-token.hpp"
+#include "config.h"
+#include "str_expand.h"
 
 loyaltytoken::loyaltytoken(account_name self) :
 	eosio::contract(self),
+	exchange(eosio::string_to_name(STR(EXCHANGE))),
 	state_singleton(this->_self, this->_self),
 	state(state_singleton.exists() ? state_singleton.get() : default_parameters())
 {}
@@ -56,6 +59,7 @@ void loyaltytoken::issue(account_name to, eosio::asset quantity, std::string mem
 
 void loyaltytoken::allowclaim(account_name from, account_name to, eosio::asset quantity) {
 	require_auth(from);
+	require_auth(this->exchange);
 
 	require_recipient(from);
 	require_recipient(to);
@@ -87,6 +91,7 @@ void loyaltytoken::allowclaim(account_name from, account_name to, eosio::asset q
 
 void loyaltytoken::claim(account_name from, account_name to, eosio::asset quantity) {
 	require_auth(to);
+	require_auth(this->exchange);
 
 	eosio_assert(quantity.amount > 0, "claim must be positive");
 
