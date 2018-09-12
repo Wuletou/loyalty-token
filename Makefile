@@ -21,6 +21,7 @@ publish:
 	$(eval TX := '{\"account\": \"eosio\", \"name\": \"setcode\", \"authorization\": [{\"actor\": \"$(ACCOUNT)\", \"permission\": \"active\"}], \"data\": {\"account\": \"$(ACCOUNT)\", \"vmtype\": 0, \"vmversion\": 0, \"code\": \"$(BYTECODE)\"}},')
 	$(eval TX += '{\"account\": \"eosio\", \"name\": \"setabi\", \"authorization\": [{\"actor\": \"$(ACCOUNT)\", \"permission\": \"active\"}], \"data\": \"$(ABI)\"},')
 	$(eval TX += '{\"account\": \"$(ACCOUNT)\", \"name\": \"setver\", \"authorization\": [{\"actor\": \"$(ACCOUNT)\", \"permission\": \"active\"}], \"data\": \"$(SETVER)\"}')
+	@echo Deploying to account '$(ACCOUNT)'
 	@echo '{"actions": [$(TX)]}' > .tx
 	cleos -u http://127.0.0.1:8887 push transaction .tx > /dev/null
 	@rm .tx
