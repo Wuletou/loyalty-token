@@ -13,7 +13,7 @@ loyaltytoken::~loyaltytoken() {
 	this->state_singleton.set(this->state, this->_self);
 }
 
-void loyaltytoken::create(account_name issuer, eosio::asset maximum_supply) {
+void loyaltytoken::create(account_name issuer, eosio::asset maximum_supply, store_info info) {
 	require_auth(this->_self);
 
 	auto sym = maximum_supply.symbol;
@@ -29,6 +29,7 @@ void loyaltytoken::create(account_name issuer, eosio::asset maximum_supply) {
 		s.supply.symbol = maximum_supply.symbol;
 		s.max_supply	= maximum_supply;
 		s.issuer = issuer;
+		s.info = info;
 	});
 }
 

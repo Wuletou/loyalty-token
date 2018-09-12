@@ -7,19 +7,6 @@
 #include <string>
 
 class loyaltytoken : public eosio::contract {
-public:
-	loyaltytoken(account_name self);
-	~loyaltytoken();
-
-	void create(account_name issuer, eosio::asset maximum_supply);
-	void issue(account_name to, eosio::asset quantity, std::string memo);
-	void allowclaim(account_name from, account_name to, eosio::asset quantity);
-	void claim(account_name from, account_name to, eosio::asset quantity);
-	void setver(std::string ver, std::string hash);
-
-	inline eosio::asset get_supply(eosio::symbol_name sym) const;
-	inline eosio::asset get_balance(account_name owner, eosio::symbol_name sym) const;
-
 private:
 	struct account {
 		eosio::asset balance;
@@ -27,10 +14,17 @@ private:
 		uint64_t primary_key() const { return balance.symbol.name(); }
 	};
 
+	struct store_info {
+		std::string name;
+		std::string url;
+		std::string logo_url;
+	};
+
 	struct currency_stats {
 		eosio::asset supply;
 		eosio::asset max_supply;
 		account_name issuer;
+		store_info info;
 		uint64_t primary_key() const { return supply.symbol.name(); }
 	};
 
@@ -70,6 +64,19 @@ private:
 
 	void sub_balance(account_name owner, eosio::asset value, account_name ram_payer);
 	void add_balance(account_name owner, eosio::asset value, account_name ram_payer);
+
+public:
+	loyaltytoken(account_name self);
+	~loyaltytoken();
+
+	void create(account_name issuer, eosio::asset maximum_supply, store_info info);
+	void issue(account_name to, eosio::asset quantity, std::string memo);
+	void allowclaim(account_name from, account_name to, eosio::asset quantity);
+	void claim(account_name from, account_name to, eosio::asset quantity);
+	void setver(std::string ver, std::string hash);
+
+	inline eosio::asset get_supply(eosio::symbol_name sym) const;
+	inline eosio::asset get_balance(account_name owner, eosio::symbol_name sym) const;
 };
 
 eosio::asset loyaltytoken::get_supply(eosio::symbol_name sym) const {

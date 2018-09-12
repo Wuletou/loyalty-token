@@ -3,6 +3,20 @@
   "version": "eosio::abi/1.0",
   "types": [],
   "structs": [{
+      "name": "store_info",
+      "base": "",
+      "fields": [{
+          "name": "name",
+          "type": "string"
+        },{
+          "name": "url",
+          "type": "string"
+        },{
+          "name": "logo_url",
+          "type": "string"
+        }
+      ]
+    },{
       "name": "create",
       "base": "",
       "fields": [{
@@ -11,6 +25,9 @@
         },{
           "name": "maximum_supply",
           "type": "asset"
+        },{
+          "name": "info",
+          "type": "store_info"
         }
       ]
     },{
@@ -28,27 +45,13 @@
         }
       ]
     },{
-      "name": "transfer",
+      "name": "allowclaim",
       "base": "",
       "fields": [{
           "name": "from",
           "type": "name"
         },{
           "name": "to",
-          "type": "name"
-        },{
-          "name": "quantity",
-          "type": "asset"
-        },{
-          "name": "memo",
-          "type": "string"
-        }
-      ]
-    },{
-      "name": "allowclaim",
-      "base": "",
-      "fields": [{
-          "name": "from",
           "type": "name"
         },{
           "name": "quantity",
@@ -67,7 +70,8 @@
         },{
           "name": "quantity",
           "type": "asset"
-       }]
+        }
+      ]
     },{
       "name": "setver",
       "base": "",
@@ -92,7 +96,8 @@
       "fields": [
         {"name":"supply", "type":"asset"},
         {"name":"max_supply", "type":"asset"},
-        {"name":"issuer", "type":"name"}
+        {"name":"issuer", "type":"name"},
+        {"name":"info", "type":"store_info"}
       ]
     },{
       "name": "version_t",
@@ -116,10 +121,6 @@
     },{
       "name": "issue",
       "type": "issue",
-      "ricardian_contract": ""
-    },{
-      "name": "transfer",
-      "type": "transfer",
       "ricardian_contract": ""
     },{
       "name": "allowclaim",
