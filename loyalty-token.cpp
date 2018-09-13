@@ -31,6 +31,11 @@ void loyaltytoken::create(account_name issuer, eosio::asset maximum_supply, stor
 		s.issuer = issuer;
 		s.info = info;
 	});
+
+	symbols symbols_table(this->_self, this->_self);
+	symbols_table.emplace(this->_self, [&](auto& s) {
+		s.symbol = maximum_supply.symbol;
+	});
 }
 
 void loyaltytoken::issue(account_name to, eosio::asset quantity, std::string memo) {

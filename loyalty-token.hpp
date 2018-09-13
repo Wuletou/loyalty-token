@@ -28,6 +28,11 @@ private:
 		uint64_t primary_key() const { return supply.symbol.name(); }
 	};
 
+	struct symbols_t {
+		eosio::symbol_name symbol;
+		uint64_t primary_key() const { return symbol; }
+	};
+
 	struct claim_t {
 		account_name to;
 		eosio::asset quantity;
@@ -45,6 +50,7 @@ private:
 
 	typedef eosio::multi_index<N(accounts), account> accounts;
 	typedef eosio::multi_index<N(stat), currency_stats> stats;
+	typedef eosio::multi_index<N(symbols), symbols_t> symbols;
 	typedef eosio::multi_index<N(claim), claim_t> claims;
 
 	account_name exchange;
