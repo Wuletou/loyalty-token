@@ -1,5 +1,5 @@
 NAME=loyalty-token
-ACCOUNT=$(word 3, $(shell cat config.h | grep EXCHANGE))
+ACCOUNT=mywishte1111
 VERSION=$(shell git tag --points-at HEAD)
 VERSIONHASH=$(shell git rev-parse HEAD)
 
@@ -7,7 +7,7 @@ all: compile publish
 
 compile: $(NAME)/$(NAME).wasm
 
-$(NAME)/$(NAME).wasm: $(NAME).cpp
+$(NAME)/$(NAME).wasm: $(NAME).cpp $(NAME).hpp
 	eosiocpp -o $(NAME)/$(NAME).wast $(NAME).cpp
 
 publish:
