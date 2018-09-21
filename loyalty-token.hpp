@@ -79,7 +79,7 @@ public:
 	void issue(account_name to, eosio::asset quantity, std::string memo);
 	void allowclaim(account_name from, account_name to, eosio::asset quantity);
 	void claim(account_name from, account_name to, eosio::asset quantity);
-	void setver(std::string ver, std::string hash);
+	void burn(account_name owner, eosio::asset value);
 
 	inline eosio::asset get_supply(eosio::symbol_name sym) const;
 	inline eosio::asset get_balance(account_name owner, eosio::symbol_name sym) const;

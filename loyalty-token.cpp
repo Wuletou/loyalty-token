@@ -123,10 +123,20 @@ void loyaltytoken::claim(account_name from, account_name to, eosio::asset quanti
 	add_balance(to, quantity, to);
 }
 
-void loyaltytoken::setver(std::string ver, std::string hash) {
-	require_auth(this->_self);
-	this->state.version.ver = ver;
-	this->state.version.hash = hash;
+void loyaltytoken::burn(account_name owner, eosio::asset value) {
+	require_auth(owner);
+
+	sub_balance(owner, value, owner);
+
+	auto sym = value.symbol.name();
+	stats statstable(this->_self, sym);
+	auto it = statstable.find(sym);
+
+	eosio_assert(it != statstable.end(), "Symbol not found");
+	
+	statstable.modify(it, owner, [&](auto& s) {
+		s.supply -= value;
+	});
 }
 
 void loyaltytoken::sub_balance(account_name owner, eosio::asset value, account_name ram_payer) {
@@ -159,4 +169,4 @@ void loyaltytoken::add_balance(account_name owner, eosio::asset value, account_n
 	}
 }
 
-EOSIO_ABI(loyaltytoken, (create)(issue)(allowclaim)(claim)(setver))
+EOSIO_ABI(loyaltytoken, (create)(issue)(allowclaim)(claim)(burn))
