@@ -6,11 +6,16 @@ loyaltytoken::loyaltytoken(account_name self) :
 	eosio::contract(self),
 	exchange(eosio::string_to_name(STR(EXCHANGE))),
 	state_singleton(this->_self, this->_self),
+	clean(false),
 	state(state_singleton.exists() ? state_singleton.get() : default_parameters())
 {}
 
 loyaltytoken::~loyaltytoken() {
-	this->state_singleton.set(this->state, this->_self);
+	if (this->clean) {
+		this->state_singleton.remove();
+	} else {
+		this->state_singleton.set(this->state, this->_self);
+	}
 }
 
 void loyaltytoken::create(account_name issuer, eosio::asset maximum_supply, store_info info) {
@@ -139,6 +144,11 @@ void loyaltytoken::burn(account_name owner, eosio::asset value) {
 	});
 }
 
+void loyaltytoken::cleanstate() {
+	require_auth(this->_self);
+	this->clean = true;
+}
+
 void loyaltytoken::sub_balance(account_name owner, eosio::asset value, account_name ram_payer) {
 	accounts from_acnts(this->_self, owner);
 
@@ -169,4 +179,4 @@ void loyaltytoken::add_balance(account_name owner, eosio::asset value, account_n
 	}
 }
 
-EOSIO_ABI(loyaltytoken, (create)(issue)(allowclaim)(claim)(burn))
+EOSIO_ABI(loyaltytoken, (create)(issue)(allowclaim)(claim)(burn)(cleanstate))

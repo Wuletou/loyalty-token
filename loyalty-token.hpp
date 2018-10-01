@@ -57,6 +57,7 @@ private:
 
 	eosio::singleton<N(state), state_t> state_singleton;
 
+	bool clean;
 	state_t state;
 
 	state_t default_parameters() {
@@ -80,6 +81,7 @@ public:
 	void allowclaim(account_name from, account_name to, eosio::asset quantity);
 	void claim(account_name from, account_name to, eosio::asset quantity);
 	void burn(account_name owner, eosio::asset value);
+	void cleanstate();
 
 	inline eosio::asset get_supply(eosio::symbol_name sym) const;
 	inline eosio::asset get_balance(account_name owner, eosio::symbol_name sym) const;

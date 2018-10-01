@@ -84,6 +84,10 @@
         }
       ]
     },{
+      "name": "cleanstate",
+      "base": "",
+      "fields": []
+    },{
       "name": "account",
       "base": "",
       "fields": [
@@ -139,6 +143,10 @@
     },{
       "name": "burn",
       "type": "burn",
+      "ricardian_contract": ""
+    },{
+      "name": "cleanstate",
+      "type": "cleanstate",
       "ricardian_contract": ""
     }
   ],
