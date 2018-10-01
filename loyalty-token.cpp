@@ -83,17 +83,20 @@ void loyaltytoken::allowclaim(account_name from, account_name to, eosio::asset q
 	});
 
 	claims from_claims(this->_self, from);
-	const auto& claim = from_claims.find(((uint128_t)to << 64) + quantity.symbol);
-	if (claim == from_claims.end()) {
-		from_claims.emplace(from, [to, quantity](auto& c) {
+	auto composite_index = from_claims.get_index<N(toquantity)>();
+
+	const auto& claim = composite_index.find(((uint128_t)to << 64) + quantity.symbol);
+	if (claim == composite_index.end()) {
+		from_claims.emplace(from, [&](auto& c) {
+			c.pk = from_claims.available_primary_key();
 			c.to = to;
 			c.quantity = quantity;
 		});
 	} else {
 		if (claim->quantity.amount == -quantity.amount) {
-			from_claims.erase(claim);
+			composite_index.erase(claim);
 		} else {
-			from_claims.modify(claim, from, [quantity](auto& c) {
+			composite_index.modify(claim, from, [quantity](auto& c) {
 				c.quantity += quantity;
 			});
 		}
@@ -114,12 +117,14 @@ void loyaltytoken::claim(account_name from, account_name to, eosio::asset quanti
 	});
 
 	claims from_claims(this->_self, from);
-	const auto& claim = from_claims.find(((uint128_t)to << 64) + quantity.symbol);
-	eosio_assert(claim != from_claims.end(), "no available claim");
+	auto composite_index = from_claims.get_index<N(toquantity)>();
+
+	const auto& claim = composite_index.find(((uint128_t)to << 64) + quantity.symbol);
+	eosio_assert(claim != composite_index.end(), "no available claim");
 	if (claim->quantity.amount == quantity.amount) {
-		from_claims.erase(claim);
+		composite_index.erase(claim);
 	} else {
-		from_claims.modify(claim, to, [quantity](auto& c) {
+		composite_index.modify(claim, to, [quantity](auto& c) {
 			c.quantity -= quantity;
 		});
 	}
