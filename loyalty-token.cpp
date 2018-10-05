@@ -4,19 +4,8 @@
 
 loyaltytoken::loyaltytoken(account_name self) :
 	eosio::contract(self),
-	exchange(eosio::string_to_name(STR(EXCHANGE))),
-	state_singleton(this->_self, this->_self),
-	clean(false),
-	state(state_singleton.exists() ? state_singleton.get() : default_parameters())
+	exchange(eosio::string_to_name(STR(EXCHANGE)))
 {}
-
-loyaltytoken::~loyaltytoken() {
-	if (this->clean) {
-		this->state_singleton.remove();
-	} else {
-		this->state_singleton.set(this->state, this->_self);
-	}
-}
 
 void loyaltytoken::create(account_name issuer, eosio::asset maximum_supply, store_info info) {
 	require_auth(this->_self);
@@ -149,9 +138,36 @@ void loyaltytoken::burn(account_name owner, eosio::asset value) {
 	});
 }
 
-void loyaltytoken::cleanstate() {
+void loyaltytoken::cleanstate(eosio::vector<eosio::symbol_type> symbs, eosio::vector<account_name> accs) {
 	require_auth(this->_self);
-	this->clean = true;
+
+	// stats
+	for (auto symbol = symbs.begin(); symbol != symbs.end(); symbol++) {
+		stats statstable(this->_self, symbol->name());
+		for (auto stat = statstable.begin(); stat != statstable.end(); ) {
+			stat = statstable.erase(stat);
+		}
+	}
+
+	//symbols
+	symbols symbols_table(this->_self, this->_self);
+	for (auto symbol = symbols_table.begin(); symbol != symbols_table.end(); ) {
+		symbol = symbols_table.erase(symbol);
+	}
+
+	for (auto account = accs.begin(); account != accs.end(); account++) {
+		// accounts
+		accounts accountstable(this->_self, *account);
+		for (auto balance = accountstable.begin(); balance != accountstable.end(); ) {
+			balance = accountstable.erase(balance);
+		}
+
+		// claims
+		claims claimstable(this->_self, *account);
+		for (auto claim = claimstable.begin(); claim != claimstable.end(); ) {
+			claim = claimstable.erase(claim);
+		}
+	}
 }
 
 void loyaltytoken::sub_balance(account_name owner, eosio::asset value, account_name ram_payer) {

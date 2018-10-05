@@ -1,1 +1,1 @@
-#define EXCHANGE wuletexchacc
+#define EXCHANGE ex

@@ -42,7 +42,7 @@ function send_transaction() {
     exit_code=$?
     echo "exit_code: "${exit_code}
     echo ${res}
-    if [[ exit_code -ne 0 && !($res = *"Contract is already running this version of code"*) ]]; then
+    if [[ exit_code -ne 0 && !($res = *"Contract is already running this version of code"*) && !($res = *"existing abi"*) && !($res = *"existing code"*) ]]; then
         exit 1
     fi
 }

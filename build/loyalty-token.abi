@@ -86,7 +86,10 @@
     },{
       "name": "cleanstate",
       "base": "",
-      "fields": []
+      "fields": [
+        {"name":"symbs", "type":"symbol[]"},
+        {"name":"accs", "type":"name[]"}
+     ]
     },{
       "name": "account",
       "base": "",
@@ -108,19 +111,6 @@
       "base": "",
       "fields": [
         {"name":"symbol", "type":"symbol"}
-      ]
-    },{
-      "name": "version_t",
-      "base": "",
-      "fields": [
-        {"name":"ver", "type":"string"}
-        {"name":"hash", "type":"string"}
-      ]
-    },{
-      "name": "state_t",
-      "base": "",
-      "fields": [
-        {"name":"version", "type":"version_t"}
       ]
     }
   ],
@@ -168,12 +158,6 @@
       "index_type": "i64",
       "key_names" : ["symbol"],
       "key_types" : ["symbol"]
-    },{
-      "name": "state",
-      "type": "state_t",
-      "index_type": "i64",
-      "key_names" : ["pk_value"],
-      "key_types" : ["uint64"]
     }
   ],
   "ricardian_clauses": [],
