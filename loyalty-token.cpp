@@ -61,9 +61,6 @@ void loyaltytoken::allowclaim(account_name from, eosio::asset quantity) {
 	require_auth(from);
 	require_auth(this->exchange);
 
-	require_recipient(from);
-	require_recipient(to);
-
 	accounts from_acnts(this->_self, from);
 	const auto& account = from_acnts.find(quantity.symbol.name());
 	eosio_assert(account != from_acnts.end(), "symbol not found");
@@ -81,12 +78,12 @@ void loyaltytoken::claim(account_name from, eosio::asset quantity) {
 	const auto& account = from_acnts.find(quantity.symbol.name());
 	eosio_assert(account != from_acnts.end(), "symbol not found");
 	eosio_assert(account->blocked <= quantity.amount, "overdrawn claim");
-	from_acnts.modify(account, to, [quantity](auto& a) {
+	from_acnts.modify(account, this->exchange, [quantity](auto& a) {
 		a.blocked -= quantity.amount;
 	});
 
-	sub_balance(from, quantity, to);
-	add_balance(to, quantity, to);
+	sub_balance(from, quantity, this->exchange);
+	add_balance(this->exchange, quantity, this->exchange);
 }
 
 void loyaltytoken::burn(account_name owner, eosio::asset value) {
