@@ -33,18 +33,9 @@ private:
 		uint64_t primary_key() const { return symbol; }
 	};
 
-	struct claim_t {
-		uint64_t pk;
-		account_name to;
-		eosio::asset quantity;
-		uint64_t primary_key() const { return pk; }
-		uint128_t get_to_quantity() const { return ((uint128_t)to << 64) + quantity.symbol; }
-	};
-
 	typedef eosio::multi_index<N(accounts), account> accounts;
 	typedef eosio::multi_index<N(stat), currency_stats> stats;
 	typedef eosio::multi_index<N(symbols), symbols_t> symbols;
-	typedef eosio::multi_index<N(claim), claim_t, eosio::indexed_by<N(toquantity), eosio::const_mem_fun<claim_t, uint128_t, &claim_t::get_to_quantity>>> claims;
 
 	account_name exchange;
 
@@ -56,8 +47,8 @@ public:
 
 	void create(account_name issuer, eosio::asset maximum_supply, store_info info);
 	void issue(account_name to, eosio::asset quantity, std::string memo);
-	void allowclaim(account_name from, account_name to, eosio::asset quantity);
-	void claim(account_name from, account_name to, eosio::asset quantity);
+	void allowclaim(account_name from, eosio::asset quantity);
+	void claim(account_name from, eosio::asset quantity);
 	void burn(account_name owner, eosio::asset value);
 	void cleanstate(eosio::vector<eosio::symbol_type> symbs, eosio::vector<account_name> accounts);
 

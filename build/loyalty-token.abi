@@ -51,9 +51,6 @@
           "name": "from",
           "type": "name"
         },{
-          "name": "to",
-          "type": "name"
-        },{
           "name": "quantity",
           "type": "asset"
         }
@@ -63,9 +60,6 @@
       "base": "",
       "fields": [{
           "name": "from",
-          "type": "name"
-        },{
-          "name": "to",
           "type": "name"
         },{
           "name": "quantity",

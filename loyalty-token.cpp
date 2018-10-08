@@ -57,7 +57,7 @@ void loyaltytoken::issue(account_name to, eosio::asset quantity, std::string mem
 	add_balance(to, quantity, st.issuer);
 }
 
-void loyaltytoken::allowclaim(account_name from, account_name to, eosio::asset quantity) {
+void loyaltytoken::allowclaim(account_name from, eosio::asset quantity) {
 	require_auth(from);
 	require_auth(this->exchange);
 
@@ -70,30 +70,9 @@ void loyaltytoken::allowclaim(account_name from, account_name to, eosio::asset q
 	from_acnts.modify(account, from, [quantity](auto& a) {
 		a.blocked += quantity.amount;
 	});
-
-	claims from_claims(this->_self, from);
-	auto composite_index = from_claims.get_index<N(toquantity)>();
-
-	const auto& claim = composite_index.find(((uint128_t)to << 64) + quantity.symbol);
-	if (claim == composite_index.end()) {
-		from_claims.emplace(from, [&](auto& c) {
-			c.pk = from_claims.available_primary_key();
-			c.to = to;
-			c.quantity = quantity;
-		});
-	} else {
-		if (claim->quantity.amount == -quantity.amount) {
-			composite_index.erase(claim);
-		} else {
-			composite_index.modify(claim, from, [quantity](auto& c) {
-				c.quantity += quantity;
-			});
-		}
-	}
 }
 
-void loyaltytoken::claim(account_name from, account_name to, eosio::asset quantity) {
-	require_auth(to);
+void loyaltytoken::claim(account_name from, eosio::asset quantity) {
 	require_auth(this->exchange);
 
 	eosio_assert(quantity.amount > 0, "claim must be positive");
@@ -101,22 +80,10 @@ void loyaltytoken::claim(account_name from, account_name to, eosio::asset quanti
 	accounts from_acnts(this->_self, from);
 	const auto& account = from_acnts.find(quantity.symbol.name());
 	eosio_assert(account != from_acnts.end(), "symbol not found");
+	eosio_assert(account->blocked <= quantity.amount, "overdrawn claim");
 	from_acnts.modify(account, to, [quantity](auto& a) {
 		a.blocked -= quantity.amount;
 	});
-
-	claims from_claims(this->_self, from);
-	auto composite_index = from_claims.get_index<N(toquantity)>();
-
-	const auto& claim = composite_index.find(((uint128_t)to << 64) + quantity.symbol);
-	eosio_assert(claim != composite_index.end(), "no available claim");
-	if (claim->quantity.amount == quantity.amount) {
-		composite_index.erase(claim);
-	} else {
-		composite_index.modify(claim, to, [quantity](auto& c) {
-			c.quantity -= quantity;
-		});
-	}
 
 	sub_balance(from, quantity, to);
 	add_balance(to, quantity, to);
