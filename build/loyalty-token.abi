@@ -77,7 +77,7 @@
       "base": "",
       "fields": [{
           "name": "owner",
-          "type": "account"
+          "type": "name"
         },{
           "name": "value",
           "type": "asset"
