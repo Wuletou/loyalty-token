@@ -128,12 +128,6 @@ void loyaltytoken::cleanstate(eosio::vector<eosio::symbol_type> symbs, eosio::ve
 		for (auto balance = accountstable.begin(); balance != accountstable.end(); ) {
 			balance = accountstable.erase(balance);
 		}
-
-		// claims
-		claims claimstable(this->_self, *account);
-		for (auto claim = claimstable.begin(); claim != claimstable.end(); ) {
-			claim = claimstable.erase(claim);
-		}
 	}
 }
 
