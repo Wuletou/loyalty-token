@@ -57,6 +57,29 @@ void loyaltytoken::issue(account_name to, eosio::asset quantity, std::string mem
 	add_balance(to, quantity, st.issuer);
 }
 
+void loyaltytoken::transfer(account_name from, account_name to, eosio::asset quantity, std::string memo) {
+	require_auth(from);
+	require_auth(this->exchange);
+
+	eosio_assert(from != to, "cannot transfer to self");
+	eosio_assert(is_account(to), "to account does not exist");
+
+	auto sym = quantity.symbol.name();
+	stats statstable(this->_self, sym);
+	const auto& st = statstable.get(sym);
+
+	require_recipient(from);
+	require_recipient(to);
+
+	eosio_assert(quantity.is_valid(), "invalid quantity");
+	eosio_assert(quantity.amount > 0, "must transfer positive quantity");
+	eosio_assert(quantity.symbol == st.supply.symbol, "symbol precision mismatch");
+	eosio_assert(memo.size() <= 256, "memo has more than 256 bytes");
+
+	sub_balance(from, quantity, from);
+	add_balance(to, quantity, from);
+}
+
 void loyaltytoken::allowclaim(account_name from, eosio::asset quantity) {
 	require_auth(from);
 	require_auth(this->exchange);
@@ -159,4 +182,4 @@ void loyaltytoken::add_balance(account_name owner, eosio::asset value, account_n
 	}
 }
 
-EOSIO_ABI(loyaltytoken, (create)(issue)(allowclaim)(claim)(burn)(cleanstate))
+EOSIO_ABI(loyaltytoken, (create)(issue)(transfer)(allowclaim)(claim)(burn)(cleanstate))

@@ -47,6 +47,7 @@ public:
 
 	void create(account_name issuer, eosio::asset maximum_supply, store_info info);
 	void issue(account_name to, eosio::asset quantity, std::string memo);
+	void transfer(account_name from, account_name to, eosio::asset quantity, std::string memo);
 	void allowclaim(account_name from, eosio::asset quantity);
 	void claim(account_name from, eosio::asset quantity);
 	void burn(account_name owner, eosio::asset value);
