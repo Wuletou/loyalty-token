@@ -45,6 +45,23 @@
         }
       ]
     },{
+      "name": "transfer",
+      "base": "",
+      "fields": [{
+          "name": "from",
+          "type": "name"
+        },{
+          "name": "to",
+          "type": "name"
+        },{
+          "name": "quantity",
+          "type": "asset"
+        },{
+          "name": "memo",
+          "type": "string"
+        }
+      ]
+    },{
       "name": "allowclaim",
       "base": "",
       "fields": [{
@@ -115,6 +132,10 @@
     },{
       "name": "issue",
       "type": "issue",
+      "ricardian_contract": ""
+    },{
+      "name": "transfer",
+      "type": "transfer",
       "ricardian_contract": ""
     },{
       "name": "allowclaim",
